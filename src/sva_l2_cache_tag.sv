@@ -80,6 +80,8 @@ state_in_valid_fc_1:
   assume property (disable iff(!rst) state_in_valid && state_in_ready |=> !state_in_valid);
 inv_ack_cnt_in_valid_fc_1:
   assume property (disable iff(!rst) inv_ack_cnt_in_valid && inv_ack_cnt_in_ready |=> !inv_ack_cnt_in_valid);
+flush_in_valid_fc_1:
+  assume property (disable iff(!rst) flush_in_valid && flush_in_ready |=> !flush_in_valid);
 
 /* come as a group */
 nom_input_0:
@@ -129,11 +131,17 @@ tag_out_evict_valid_fc_0:
 state_out_evict_valid_fc_0:
   assume property (disable iff(!rst) $rose(state_out_evict_valid) |-> state_out_evict_ready);
 
+/* one flush in progress at a time */
+flush_0:
+  assume property (disable iff(!rst) $fell(flush_in_valid) |-> !flush_in_valid[*] ##1 flush_complete_valid);
+flush_complete_valid_fc_0:
+  assume property (disable iff(!rst) $rose(flush_complete_valid) |-> flush_complete_ready);
+
 /*
  * BASIC COVERS
  */
 
-/* Input covers */
+/* DUT input covers */
 rst_cover_0: cover property (!rst);
 rst_cover_1: cover property (rst);
 
@@ -148,35 +156,35 @@ inv_ack_cnt_in_valid_cover_1: cover property (inv_ack_cnt_in_valid);
 
 flush_in_valid_cover_0: cover property (!flush_in_valid);
 flush_in_valid_cover_1: cover property (flush_in_valid);
-flush_complete_ready_cover_0: cover property (!flush_complete_ready);
+//flush_complete_ready_cover_0: cover property (!flush_complete_ready);
 flush_complete_ready_cover_1: cover property (flush_complete_ready);
 
-way_out_ready_cover_0: cover property (!way_out_ready);
+//way_out_ready_cover_0: cover property (!way_out_ready);
 way_out_ready_cover_1: cover property (way_out_ready);
-state_out_ready_cover_0: cover property (!state_out_ready);
+//state_out_ready_cover_0: cover property (!state_out_ready);
 state_out_ready_cover_1: cover property (state_out_ready);
-inv_ack_cnt_out_ready_cover_0: cover property (!inv_ack_cnt_out_ready);
+//inv_ack_cnt_out_ready_cover_0: cover property (!inv_ack_cnt_out_ready);
 inv_ack_cnt_out_ready_cover_1: cover property (inv_ack_cnt_out_ready);
 
-tag_out_evict_ready_cover_0: cover property (!tag_out_evict_ready);
+//tag_out_evict_ready_cover_0: cover property (!tag_out_evict_ready);
 tag_out_evict_ready_cover_1: cover property (tag_out_evict_ready);
-set_out_evict_ready_cover_0: cover property (!set_out_evict_ready);
+//set_out_evict_ready_cover_0: cover property (!set_out_evict_ready);
 set_out_evict_ready_cover_1: cover property (set_out_evict_ready);
-state_out_evict_ready_cover_0: cover property (!state_out_evict_ready);
+//state_out_evict_ready_cover_0: cover property (!state_out_evict_ready);
 state_out_evict_ready_cover_1: cover property (state_out_evict_ready);
 
-way_out_flush_ready_cover_0: cover property (!way_out_flush_ready);
+//way_out_flush_ready_cover_0: cover property (!way_out_flush_ready);
 way_out_flush_ready_cover_1: cover property (way_out_flush_ready);
-tag_out_flush_ready_cover_0: cover property (!tag_out_flush_ready);
+//tag_out_flush_ready_cover_0: cover property (!tag_out_flush_ready);
 tag_out_flush_ready_cover_1: cover property (tag_out_flush_ready);
-set_out_flush_ready_cover_0: cover property (!set_out_flush_ready);
+//set_out_flush_ready_cover_0: cover property (!set_out_flush_ready);
 set_out_flush_ready_cover_1: cover property (set_out_flush_ready);
-state_out_flush_ready_cover_0: cover property (!state_out_flush_ready);
+//state_out_flush_ready_cover_0: cover property (!state_out_flush_ready);
 state_out_flush_ready_cover_1: cover property (state_out_flush_ready);
-inv_ack_cnt_out_flush_ready_cover_0: cover property (!inv_ack_cnt_out_flush_ready);
+//inv_ack_cnt_out_flush_ready_cover_0: cover property (!inv_ack_cnt_out_flush_ready);
 inv_ack_cnt_out_flush_ready_cover_1: cover property (inv_ack_cnt_out_flush_ready);
 
-/* output covers */
+/* DUT output covers */
 tag_in_ready_cover_0: cover property (!tag_in_ready);
 tag_in_ready_cover_1: cover property (tag_in_ready);
 set_in_ready_cover_0: cover property (!set_in_ready);
@@ -286,7 +294,11 @@ mem_inv_ack_cnt_CE8_cover_1: cover property (mem_inv_ack_cnt_CE8);
  */
 rsp_latency_0:
   assert property (disable iff(!rst)
-    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready && !flush_in_valid) |->
-      ##[0:50] ($rose(way_out_valid)));
+    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
+      ##[0:7] ($rose(way_out_valid)));
+rsp_latency_1:
+  assert property (disable iff(!rst || flush_in_valid)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
+      ##[0:5] ($rose(way_out_valid)));
 
 endmodule
