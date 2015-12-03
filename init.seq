@@ -1,6 +1,9 @@
+$default_clock clk
 $default_input_value 0
 rst = 0
 
-## 50
+## 5000
 
 rst = 1
+
+## 5000
