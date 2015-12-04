@@ -295,7 +295,12 @@ mem_inv_ack_cnt_CE8_cover_1: cover property (mem_inv_ack_cnt_CE8);
 rsp_latency_0:
   assert property (disable iff(!rst)
     ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
-      ##[0:7] ($rose(way_out_valid)));
+      ##[0:6] ($rose(way_out_valid)));
+
+/*
+ * Kind of a worthless property because we could be currently flushing while this
+ * happens so we'd still see a latency delay
+ */
 rsp_latency_1:
   assert property (disable iff(!rst || flush_in_valid)
     ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
