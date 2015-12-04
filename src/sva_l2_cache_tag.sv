@@ -142,7 +142,7 @@ flush_complete_valid_fc_0:
  */
 
 /* DUT input covers */
-rst_cover_0: cover property (!rst);
+//rst_cover_0: cover property (!rst);
 rst_cover_1: cover property (rst);
 
 tag_in_valid_cover_0: cover property (!tag_in_valid);
