@@ -1,0 +1,5 @@
+work/
+formal_results/
+modelsim.ini
+src/l2_cache_tag_unisim_*
+.qverify_ui_local_prefs
