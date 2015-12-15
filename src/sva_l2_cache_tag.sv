@@ -60,7 +60,6 @@ default clocking c0 @(posedge clk); endclocking
 /*
  * ASSUMPTIONS
  */
-
 /* always ready for nominal request since there's a max of 1 in flight at a time */
 tag_in_valid_fc_0:
   assume property (disable iff(!rst) $rose(tag_in_valid) |-> tag_in_ready);
@@ -71,7 +70,7 @@ state_in_valid_fc_0:
 inv_ack_cnt_in_valid_fc_0:
   assume property (disable iff(!rst) $rose(inv_ack_cnt_in_valid) |-> inv_ack_cnt_in_ready);
 
-/* flex channel semantics */
+/* flex channel semantics on inputs */
 tag_in_valid_fc_1:
   assume property (disable iff(!rst) tag_in_valid && tag_in_ready |=> !tag_in_valid);
 set_in_valid_fc_1:
@@ -120,7 +119,7 @@ tag_out_evict_valid_fc_0:
 state_out_evict_valid_fc_0:
   assume property (disable iff(!rst) $rose(state_out_evict_valid) |-> state_out_evict_ready);
 
-/* flushes might build up because caching other things */
+/* flushes might not immediately process because main cache is backed up */
 way_out_flush_valid_fc_0:
   assume property (disable iff(!rst) $rose(way_out_flush_valid) |-> ##[0:5] way_out_flush_ready);
 set_out_flush_valid_fc_0:
@@ -144,7 +143,6 @@ flush_complete_valid_fc_0:
  */
 
 /* DUT input covers */
-//rst_cover_0: cover property (!rst);
 rst_cover_1: cover property (rst);
 
 tag_in_valid_cover_0: cover property (!tag_in_valid);
@@ -158,32 +156,28 @@ inv_ack_cnt_in_valid_cover_1: cover property (inv_ack_cnt_in_valid);
 
 flush_in_valid_cover_0: cover property (!flush_in_valid);
 flush_in_valid_cover_1: cover property (flush_in_valid);
-//flush_complete_ready_cover_0: cover property (!flush_complete_ready);
+flush_complete_ready_cover_0: cover property (!flush_complete_ready);
 flush_complete_ready_cover_1: cover property (flush_complete_ready);
 
-//way_out_ready_cover_0: cover property (!way_out_ready);
+/* always ready to read response */
 way_out_ready_cover_1: cover property (way_out_ready);
-//state_out_ready_cover_0: cover property (!state_out_ready);
 state_out_ready_cover_1: cover property (state_out_ready);
-//inv_ack_cnt_out_ready_cover_0: cover property (!inv_ack_cnt_out_ready);
 inv_ack_cnt_out_ready_cover_1: cover property (inv_ack_cnt_out_ready);
 
-//tag_out_evict_ready_cover_0: cover property (!tag_out_evict_ready);
+/* evict out already ready */
 tag_out_evict_ready_cover_1: cover property (tag_out_evict_ready);
-//set_out_evict_ready_cover_0: cover property (!set_out_evict_ready);
 set_out_evict_ready_cover_1: cover property (set_out_evict_ready);
-//state_out_evict_ready_cover_0: cover property (!state_out_evict_ready);
 state_out_evict_ready_cover_1: cover property (state_out_evict_ready);
 
-//way_out_flush_ready_cover_0: cover property (!way_out_flush_ready);
+way_out_flush_ready_cover_0: cover property (!way_out_flush_ready);
 way_out_flush_ready_cover_1: cover property (way_out_flush_ready);
-//tag_out_flush_ready_cover_0: cover property (!tag_out_flush_ready);
+tag_out_flush_ready_cover_0: cover property (!tag_out_flush_ready);
 tag_out_flush_ready_cover_1: cover property (tag_out_flush_ready);
-//set_out_flush_ready_cover_0: cover property (!set_out_flush_ready);
+set_out_flush_ready_cover_0: cover property (!set_out_flush_ready);
 set_out_flush_ready_cover_1: cover property (set_out_flush_ready);
-//state_out_flush_ready_cover_0: cover property (!state_out_flush_ready);
+state_out_flush_ready_cover_0: cover property (!state_out_flush_ready);
 state_out_flush_ready_cover_1: cover property (state_out_flush_ready);
-//inv_ack_cnt_out_flush_ready_cover_0: cover property (!inv_ack_cnt_out_flush_ready);
+inv_ack_cnt_out_flush_ready_cover_0: cover property (!inv_ack_cnt_out_flush_ready);
 inv_ack_cnt_out_flush_ready_cover_1: cover property (inv_ack_cnt_out_flush_ready);
 
 /* DUT output covers */
@@ -292,7 +286,7 @@ mem_inv_ack_cnt_CE8_cover_0: cover property (!mem_inv_ack_cnt_CE8);
 mem_inv_ack_cnt_CE8_cover_1: cover property (mem_inv_ack_cnt_CE8);
 
 /*
- *  LIVENESS CONSTRAINT
+ * LIVENESS CONSTRAINT
  */
 rsp_liveness_0:
   assert property (disable iff(!rst)
