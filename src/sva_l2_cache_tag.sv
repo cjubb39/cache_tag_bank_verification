@@ -61,7 +61,7 @@ default clocking c0 @(posedge clk); endclocking
  * ASSUMPTIONS
  */
 
-/* TODO currently overconstrained */
+/* always ready for nominal request since there's a max of 1 in flight at a time */
 tag_in_valid_fc_0:
   assume property (disable iff(!rst) $rose(tag_in_valid) |-> tag_in_ready);
 set_in_valid_fc_0:
@@ -113,23 +113,25 @@ state_out_valid_fc_0:
 inv_ack_cnt_out_valid_fc_0:
   assume property (disable iff(!rst) $rose(inv_ack_cnt_out_valid) |-> inv_ack_cnt_out_ready);
 
-way_out_flush_valid_fc_0:
-  assume property (disable iff(!rst) $rose(way_out_flush_valid) |-> way_out_flush_ready);
-set_out_flush_valid_fc_0:
-  assume property (disable iff(!rst) $rose(set_out_flush_valid) |-> set_out_flush_ready);
-tag_out_flush_valid_fc_0:
-  assume property (disable iff(!rst) $rose(tag_out_flush_valid) |-> tag_out_flush_ready);
-state_out_flush_valid_fc_0:
-  assume property (disable iff(!rst) $rose(state_out_flush_valid) |-> state_out_flush_ready);
-inv_ack_cnt_out_flush_valid_fc_0:
-  assume property (disable iff(!rst) $rose(inv_ack_cnt_out_flush_valid) |-> inv_ack_cnt_out_flush_ready);
-
 set_out_evict_valid_fc_0:
   assume property (disable iff(!rst) $rose(set_out_evict_valid) |-> set_out_evict_ready);
 tag_out_evict_valid_fc_0:
   assume property (disable iff(!rst) $rose(tag_out_evict_valid) |-> tag_out_evict_ready);
 state_out_evict_valid_fc_0:
   assume property (disable iff(!rst) $rose(state_out_evict_valid) |-> state_out_evict_ready);
+
+/* flushes might build up because caching other things */
+way_out_flush_valid_fc_0:
+  assume property (disable iff(!rst) $rose(way_out_flush_valid) |-> ##[0:5] way_out_flush_ready);
+set_out_flush_valid_fc_0:
+  assume property (disable iff(!rst) $rose(set_out_flush_valid) |-> ##[0:5] set_out_flush_ready);
+tag_out_flush_valid_fc_0:
+  assume property (disable iff(!rst) $rose(tag_out_flush_valid) |-> ##[0:5] tag_out_flush_ready);
+state_out_flush_valid_fc_0:
+  assume property (disable iff(!rst) $rose(state_out_flush_valid) |-> ##[0:5] state_out_flush_ready);
+inv_ack_cnt_out_flush_valid_fc_0:
+  assume property (disable iff(!rst) $rose(inv_ack_cnt_out_flush_valid) |-> ##[0:5] inv_ack_cnt_out_flush_ready);
+
 
 /* one flush in progress at a time */
 flush_0:
