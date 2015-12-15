@@ -292,6 +292,14 @@ mem_inv_ack_cnt_CE8_cover_0: cover property (!mem_inv_ack_cnt_CE8);
 mem_inv_ack_cnt_CE8_cover_1: cover property (mem_inv_ack_cnt_CE8);
 
 /*
+ *  LIVENESS CONSTRAINT
+ */
+rsp_liveness_0:
+  assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
+      (!way_out_valid) [*0:$] ##1 ($rose(way_out_valid)));
+
+/*
  * LATENCY CONSTRAINTS
  */
 rsp_latency_0:
