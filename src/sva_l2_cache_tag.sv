@@ -6,6 +6,7 @@ way_out_ready, state_out_ready, inv_ack_cnt_out_ready, tag_out_evict_ready,
 set_out_evict_ready, state_out_evict_ready, way_out_flush_ready, 
 inv_ack_cnt_out_flush_ready, tag_out_flush_ready, set_out_flush_ready, 
 state_out_flush_ready, 
+internal_state,
 tag_in_ready, set_in_ready, state_in_ready, 
 inv_ack_cnt_in_ready, flush_in_ready, flush_complete_valid,
 way_out_valid, state_out_valid,
@@ -35,6 +36,8 @@ input     way_out_ready, state_out_ready, inv_ack_cnt_out_ready;
 input     tag_out_evict_ready, set_out_evict_ready, state_out_evict_ready;
 input     way_out_flush_ready, inv_ack_cnt_out_flush_ready, tag_out_flush_ready;
 input     set_out_flush_ready, state_out_flush_ready;
+
+input [7:0] internal_state;
 
 input     tag_in_ready, set_in_ready, state_in_ready, inv_ack_cnt_in_ready;
 input     flush_in_ready, flush_complete_valid;
@@ -310,4 +313,20 @@ rsp_latency_1:
     ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
       ##[0:5] ($rose(way_out_valid)));
 
+/*
+ * No flushing happening at all
+ */
+rsp_latency_2:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
+      ##[0:4] ($rose(way_out_valid)));
+
+/*
+ * No flushing happening at all and a read hit
+ * Hoping for non-vacuous result, therefore more of a cover property
+ */
+rsp_latency_3:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    (($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) ##2 (internal_state == 12)) |->
+      ($rose(way_out_valid)));
 endmodule
