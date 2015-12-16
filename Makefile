@@ -9,7 +9,7 @@ formal: compile
 	qverify -c -do formal.do -od formal_results
 
 compile:
-	vlog ./src/l2_cache_tag_unisim_rtl.v -pslfile ./src/l2_cache_tag_unisim_assertions.psl
+	vlog ./src/l2_cache_tag_unisim_rtl.v
 	vlog -sv -mfcu -cuname my_bind_sva ./src/sva_bind.sv ./src/sva_l2_cache_tag.sv
 
 init: clean
