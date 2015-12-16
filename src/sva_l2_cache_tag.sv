@@ -329,4 +329,23 @@ rsp_latency_3:
   assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
     (($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) ##2 (internal_state == 12)) |->
       ($rose(way_out_valid)));
+
+
+/*
+ * TB BRANCH UNCOVERED: LIVENESS AND LATENCY
+ */
+rsp_liveness_iac_0:
+  assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && $rose(inv_ack_cnt_in_valid) && !state_in_valid &&
+      tag_in_ready && set_in_ready && inv_ack_cnt_in_ready) |=>
+        ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:$] ##1
+          ($rose(way_out_valid))));
+
+rsp_latency_iac_0:
+  assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && $rose(inv_ack_cnt_in_valid) && !state_in_valid &&
+      tag_in_ready && set_in_ready && inv_ack_cnt_in_ready) |=>
+        ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:4] ##1
+          ($rose(way_out_valid))));
+
 endmodule
