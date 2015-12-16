@@ -299,7 +299,12 @@ rsp_liveness_0:
 /*
  * LATENCY CONSTRAINTS
  */
-rsp_latency_0:
+rsp_latency_0_7:
+  assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
+      ##[0:7] ($rose(way_out_valid)));
+
+rsp_latency_0_6:
   assert property (disable iff(!rst)
     ($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) |->
       ##[0:6] ($rose(way_out_valid)));
@@ -341,8 +346,22 @@ rsp_liveness_iac_0:
         ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:$] ##1
           ($rose(way_out_valid))));
 
-rsp_latency_iac_0:
+rsp_latency_iac_0_6:
   assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && $rose(inv_ack_cnt_in_valid) && !state_in_valid &&
+      tag_in_ready && set_in_ready && inv_ack_cnt_in_ready) |=>
+        ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:6] ##1
+          ($rose(way_out_valid))));
+
+rsp_latency_iac_0_5:
+  assert property (disable iff(!rst)
+    ($rose(tag_in_valid) && $rose(set_in_valid) && $rose(inv_ack_cnt_in_valid) && !state_in_valid &&
+      tag_in_ready && set_in_ready && inv_ack_cnt_in_ready) |=>
+        ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:5] ##1
+          ($rose(way_out_valid))));
+
+rsp_latency_iac_1:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
     ($rose(tag_in_valid) && $rose(set_in_valid) && $rose(inv_ack_cnt_in_valid) && !state_in_valid &&
       tag_in_ready && set_in_ready && inv_ack_cnt_in_ready) |=>
         ((!tag_in_valid && !set_in_valid && !inv_ack_cnt_in_valid && !state_in_valid) [*0:4] ##1
