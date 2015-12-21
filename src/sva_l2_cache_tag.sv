@@ -339,7 +339,7 @@ rsp_latency_3:
  * Get an actual bound on hit latency, rather than a cover-like property
  */
 rsp_latency_4a:
-  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+  cover property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
     ((internal_state == 12) |-> ($rose(way_out_valid))));
 
 /* 69 seconds */
