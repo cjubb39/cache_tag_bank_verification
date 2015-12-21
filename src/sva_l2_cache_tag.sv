@@ -328,18 +328,17 @@ rsp_latency_2:
 
 /*
  * No flushing happening at all and a read hit
- * Hoping for non-vacuous result, therefore more of a cover property
  */
 rsp_latency_3:
-  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
-    (($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) ##2 (internal_state == 12)) |->
-      ($rose(way_out_valid)));
+  cover property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    (($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready)
+      ##2 ((internal_state == 12) && ($rose(way_out_valid)))));
 
 /*
  * Get an actual bound on hit latency, rather than a cover-like property
  */
 rsp_latency_4a:
-  cover property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
     ((internal_state == 12) |-> ($rose(way_out_valid))));
 
 /* 69 seconds */
