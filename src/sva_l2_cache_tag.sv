@@ -335,6 +335,35 @@ rsp_latency_3:
     (($rose(tag_in_valid) && $rose(set_in_valid) && tag_in_ready && set_in_ready) ##2 (internal_state == 12)) |->
       ($rose(way_out_valid)));
 
+/*
+ * Get an actual bound on hit latency, rather than a cover-like property
+ */
+rsp_latency_4a:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    ((internal_state == 12) |-> ($rose(way_out_valid))));
+
+/* 69 seconds */
+rsp_latency_4b_6:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    ((internal_state == 12) |->
+      ($past(tag_in_valid, 6) && $past(set_in_valid, 6) && $past(tag_in_ready, 6) && $past(set_in_ready, 6)) ||
+      ($past(tag_in_valid, 5) && $past(set_in_valid, 5) && $past(tag_in_ready, 5) && $past(set_in_ready, 5)) ||
+      ($past(tag_in_valid, 4) && $past(set_in_valid, 4) && $past(tag_in_ready, 4) && $past(set_in_ready, 4)) ||
+      ($past(tag_in_valid, 3) && $past(set_in_valid, 3) && $past(tag_in_ready, 3) && $past(set_in_ready, 3)) ||
+      ($past(tag_in_valid, 2) && $past(set_in_valid, 2) && $past(tag_in_ready, 2) && $past(set_in_ready, 2)) ||
+      ($past(tag_in_valid, 1) && $past(set_in_valid, 1) && $past(tag_in_ready, 1) && $past(set_in_ready, 1))
+    ));
+
+/* 3 hours */
+rsp_latency_4b_5:
+  assert property (disable iff(!rst || flush_in_valid || way_out_flush_valid)
+    ((internal_state == 12) |->
+      ($past(tag_in_valid, 5) && $past(set_in_valid, 5) && $past(tag_in_ready, 5) && $past(set_in_ready, 5)) ||
+      ($past(tag_in_valid, 4) && $past(set_in_valid, 4) && $past(tag_in_ready, 4) && $past(set_in_ready, 4)) ||
+      ($past(tag_in_valid, 3) && $past(set_in_valid, 3) && $past(tag_in_ready, 3) && $past(set_in_ready, 3)) ||
+      ($past(tag_in_valid, 2) && $past(set_in_valid, 2) && $past(tag_in_ready, 2) && $past(set_in_ready, 2)) ||
+      ($past(tag_in_valid, 1) && $past(set_in_valid, 1) && $past(tag_in_ready, 1) && $past(set_in_ready, 1))
+    ));
 
 /*
  * TB BRANCH UNCOVERED: LIVENESS AND LATENCY
